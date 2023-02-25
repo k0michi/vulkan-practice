@@ -1,3 +1,7 @@
+/*
+  SDL2の初期化と、ウィンドウの作成を行う
+*/
+
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
@@ -54,7 +58,10 @@ class Application {
     }
   }
 
-  void finalize() { SDL_Quit(); }
+  void finalize() {
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+  }
 };
 
 int main(int argc, char* argv[]) {
