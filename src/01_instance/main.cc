@@ -103,6 +103,10 @@ class Application {
     if (result != VK_SUCCESS) {
       throw std::runtime_error("vkCreateInstance() failed; result: " +
                                std::to_string(result));
+    } else {
+      std::cout << "\x1b[32m# "
+                << "vkCreateInstance() succeeded"
+                << "\x1b[39m" << std::endl;
     }
   }
 
@@ -213,7 +217,7 @@ int main(int argc, char* argv[]) {
 
     app.run(args);
   } catch (const std::exception& e) {
-    std::cerr << "\x1b[31m# " << e.what() << std::endl;
+    std::cerr << "\x1b[31m# " << e.what() << "\x1b[39m" << std::endl;
     return EXIT_FAILURE;
   }
 
