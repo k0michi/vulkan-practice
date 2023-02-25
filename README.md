@@ -11,7 +11,7 @@ CC0 1.0
 - [Vulkan.org](https://www.vulkan.org/)
 - [Khronos Vulkan Registry](https://registry.khronos.org/vulkan/)
   - 仕様書、リファレンスへのリンク集
-- [Vulkan 1.3 Specification](hhttps://registry.khronos.org/vulkan/specs/1.3-extensions/html/index.html)
+- [Vulkan 1.3 Specification](https://registry.khronos.org/vulkan/specs/1.3-extensions/html/index.html)
   - 仕様書
 - [Vulkan 1.3 API Reference Pages](https://registry.khronos.org/vulkan/specs/1.3-extensions/man/html/)
   - 関数名、構造体名から探し出せる
