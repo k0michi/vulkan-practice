@@ -113,6 +113,8 @@ class Application {
         static_cast<uint32_t>(extensionNames.size());
     instanceInfo.ppEnabledExtensionNames = extensionNames.data();
 
+    // vkCreateInstance(pCreateInfo, pAllocator, pInstance)
+    // 今回はアロケータを使用しない (nullptr)
     VkResult result = vkCreateInstance(&instanceInfo, nullptr, &instance);
 
     if (result != VK_SUCCESS) {
