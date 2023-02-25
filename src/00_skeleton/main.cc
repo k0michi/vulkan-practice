@@ -12,9 +12,9 @@
 
 class Application {
  public:
-  const char* TITLE = "00_skeleton";
-  uint32_t WIDTH = 960;
-  uint32_t HEIGHT = 570;
+  static constexpr char* TITLE = "00_skeleton";
+  static constexpr uint32_t WIDTH = 960;
+  static constexpr uint32_t HEIGHT = 570;
 
  private:
   SDL_Window* window;
