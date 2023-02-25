@@ -12,7 +12,7 @@
 
 class Application {
  public:
-  static constexpr char* TITLE = "00_skeleton";
+  static constexpr char TITLE[] = "00_skeleton";
   static constexpr uint32_t WIDTH = 960;
   static constexpr uint32_t HEIGHT = 570;
 
