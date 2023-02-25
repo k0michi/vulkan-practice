@@ -182,7 +182,6 @@ class Application {
 
     std::vector<const char*> extensionNames(sdlExtensionCount);
 
-    extensionNames.resize(sdlExtensionCount);
     SDL_Vulkan_GetInstanceExtensions(window, &sdlExtensionCount,
                                      extensionNames.data());
 
