@@ -72,30 +72,13 @@ class Application {
     // 使用するAPIのバージョン
     appInfo.apiVersion = VK_API_VERSION_1_0;
 
-    // VulkanとSDLは、エクステンションを通じてやりとりするので、SDLからVulkanインスタンスに登録すべきエクステンションのリストを取得する
-    unsigned int sdlExtensionCount;
-    SDL_Vulkan_GetInstanceExtensions(window, &sdlExtensionCount, nullptr);
+    showAvailableExtensions(getAvailableExtensions());
 
-    std::vector<const char*> extensionNames(sdlExtensionCount);
-    VkInstanceCreateFlags flags = 0;
+    VkInstanceCreateFlags flags = getInstanceCreateFlags();
+    std::vector<const char*> extensionNames = getRequiredExtensions();
 
-    extensionNames.resize(sdlExtensionCount);
-    SDL_Vulkan_GetInstanceExtensions(window, &sdlExtensionCount,
-                                     extensionNames.data());
-
-#if SUPPORT_MOLTENVK
-    // MoltenVKに対応する場合は、以下のエクステンションとフラグを指定する必要がある
-    extensionNames.push_back(
-        VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
-    extensionNames.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
-    flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
-#endif
-
-    std::cout << "# Enabled extensions:" << std::endl;
-
-    for (auto&& ext : extensionNames) {
-      std::cout << "| " << ext << std::endl;
-    }
+    showInstanceCreateFlags(flags);
+    showRequiredExtensions(extensionNames);
 
     // インスタンスの設定
     VkInstanceCreateInfo instanceInfo{};
@@ -145,6 +128,77 @@ class Application {
     SDL_DestroyWindow(window);
     SDL_Quit();
   }
+
+  VkInstanceCreateFlags getInstanceCreateFlags() {
+    VkInstanceCreateFlags flags = 0;
+
+#if SUPPORT_MOLTENVK
+    // MoltenVKに対応する場合は、VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHRフラグを指定する
+    flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+#endif
+
+    return flags;
+  }
+
+  void showInstanceCreateFlags(VkInstanceCreateFlags flags) {
+    std::cout << "# Instance create flags: " << flags << std::endl;
+  }
+
+  // 利用可能なエクステンションを取得する
+  std::vector<VkExtensionProperties> getAvailableExtensions() {
+    uint32_t availableExtensionCount;
+    // vkEnumerateInstanceExtensionProperties(pLayerName, pPropertyCount,
+    // pProperties)
+    vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount,
+                                           nullptr);
+
+    std::vector<VkExtensionProperties> availableExtensions(
+        availableExtensionCount);
+
+    vkEnumerateInstanceExtensionProperties(nullptr, &availableExtensionCount,
+                                           availableExtensions.data());
+    return availableExtensions;
+  }
+
+  void showAvailableExtensions(
+      const std::vector<VkExtensionProperties>& extensions) {
+    std::cout << "# Available extensions:" << std::endl;
+
+    for (auto&& ext : extensions) {
+      std::cout << "| " << ext.extensionName << " (" << ext.specVersion << ")"
+                << std::endl;
+    }
+  }
+
+  // 必要となるエクステンションを取得する
+  std::vector<const char*> getRequiredExtensions() {
+    // VulkanとSDLは、エクステンションを通じてやりとりするので、SDLからVulkanインスタンスに登録すべきエクステンションのリストを取得する
+    unsigned int sdlExtensionCount;
+    SDL_Vulkan_GetInstanceExtensions(window, &sdlExtensionCount, nullptr);
+
+    std::vector<const char*> extensionNames(sdlExtensionCount);
+
+    extensionNames.resize(sdlExtensionCount);
+    SDL_Vulkan_GetInstanceExtensions(window, &sdlExtensionCount,
+                                     extensionNames.data());
+
+#if SUPPORT_MOLTENVK
+    // MoltenVKに対応する場合は、以下のエクステンションが必要となる
+    extensionNames.push_back(
+        VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+    extensionNames.push_back(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+#endif
+
+    return extensionNames;
+  }
+
+  void showRequiredExtensions(const std::vector<const char*>& extensions) {
+    std::cout << "# Required extensions:" << std::endl;
+
+    for (auto&& ext : extensions) {
+      std::cout << "| " << ext << std::endl;
+    }
+  }
 };
 
 int main(int argc, char* argv[]) {
@@ -159,7 +213,7 @@ int main(int argc, char* argv[]) {
 
     app.run(args);
   } catch (const std::exception& e) {
-    std::cerr << "\x1b[31m" << e.what() << std::endl;
+    std::cerr << "\x1b[31m# " << e.what() << std::endl;
     return EXIT_FAILURE;
   }
 
