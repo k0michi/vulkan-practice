@@ -33,6 +33,7 @@ class Application {
   VkDebugUtilsMessengerEXT debugMessenger;
   VkPhysicalDevice physicalDevice;
   VkDevice device;
+  VkQueue graphicsQueue;
 
  public:
   void run(const std::vector<std::string>& args) {
@@ -169,9 +170,10 @@ class Application {
     // 有効化するキューファミリーのインデックスを格納する
     // セットに格納することで、インデックスは重複しない
     std::set<uint32_t> queueFamilyIndices;
-    // グラフィックス命令をサポートするキューファミリーを有効化する
-    queueFamilyIndices.insert(
-        *findQueueFamilyIndex(physicalDevice, VK_QUEUE_GRAPHICS_BIT));
+    // グラフィックス命令をサポートするキューファミリーのインデックスを取得する
+    uint32_t graphicsQueueFamilyIndex =
+        *findQueueFamilyIndex(physicalDevice, VK_QUEUE_GRAPHICS_BIT);
+    queueFamilyIndices.insert(graphicsQueueFamilyIndex);
 
     // VkDeviceQueueCreateInfoには論理デバイスと共に作成するキューの情報を格納する
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
@@ -231,6 +233,11 @@ class Application {
                 << "vkCreateDevice() succeeded" << Console::fgDefault
                 << std::endl;
     }
+
+    // vkGetDeviceQueue(device, queueFamilyIndex, queueIndex, pQueue)
+    // 作成したキューを取得する
+    // queueIndexはキューファミリー内のキューのインデックス
+    vkGetDeviceQueue(device, graphicsQueueFamilyIndex, 0, &graphicsQueue);
   }
 
   static VKAPI_ATTR VkBool32 VKAPI_CALL
