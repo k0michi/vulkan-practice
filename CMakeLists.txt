@@ -40,3 +40,16 @@ target_link_libraries(02_validation SDL2::SDL2-static)
 
 target_include_directories(02_validation PRIVATE ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(02_validation ${Vulkan_LIBRARIES} "-framework AppKit" "-framework QuartzCore")
+
+
+# 03
+add_executable(03_device
+  src/03_device/main.cc
+  src/03_device/vulkan_ext.cc
+)
+
+target_include_directories(03_device PRIVATE third_party/SDL/include)
+target_link_libraries(03_device SDL2::SDL2-static)
+
+target_include_directories(03_device PRIVATE ${Vulkan_INCLUDE_DIRS})
+target_link_libraries(03_device ${Vulkan_LIBRARIES} "-framework AppKit" "-framework QuartzCore")
