@@ -204,6 +204,7 @@ class Application {
     deviceInfo.ppEnabledExtensionNames = deviceExtensionNames.data();
     deviceInfo.pEnabledFeatures = &enabledFeatures;
 
+    // vkCreateDevice(physicalDevice, pCreateInfo, pAllocator, pDevice)
     result = vkCreateDevice(physicalDevice, &deviceInfo, nullptr, &device);
 
     if (result != VK_SUCCESS) {
@@ -259,6 +260,7 @@ class Application {
   }
 
   void finalizeVulkan() {
+    // vkDestroyDevice(device, pAllocator)
     vkDestroyDevice(device, nullptr);
 
 #if ENABLE_VALIDATION
