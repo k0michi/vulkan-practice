@@ -186,6 +186,7 @@ class Application {
 
     std::vector<const char*> deviceExtensionNames =
         getRequiredDeviceExtensions(physicalDevice);
+    showExtensions("Required device extensions", deviceExtensionNames);
 
     VkPhysicalDeviceFeatures enabledFeatures{};
 
