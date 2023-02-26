@@ -160,15 +160,20 @@ class Application {
 
     showPhysicalDevices("Available physical devices", getPhysicalDevices());
 
+    // 使用する物理デバイスを選択する
     physicalDevice = selectPhysicalDevice();
     showPhysicalDevice("Selected physical device", physicalDevice);
     showExtensions("Available device extensions",
                    getDeviceExtensionProperties(physicalDevice));
 
+    // 有効化するキューファミリーのインデックスを格納する
+    // セットに格納することで、インデックスは重複しない
     std::set<uint32_t> queueFamilyIndices;
+    // グラフィックス命令をサポートするキューファミリーを有効化する
     queueFamilyIndices.insert(
-        findQueueFamilyIndices(physicalDevice, VK_QUEUE_GRAPHICS_BIT)[0]);
+        *findQueueFamilyIndex(physicalDevice, VK_QUEUE_GRAPHICS_BIT));
 
+    // VkDeviceQueueCreateInfoには論理デバイスと共に作成するキューの情報を格納する
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 
     float queuePriority = 1.0f;
@@ -178,8 +183,14 @@ class Application {
       queueInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
       queueInfo.pNext = nullptr;
       queueInfo.flags = 0;
+      // キューをどのキューファミリーから作成するかを指定する
+      // vkGetPhysicalDeviceQueueFamilyProperties()が返すpQueueFamilyPropertiesへのインデックスである
       queueInfo.queueFamilyIndex = index;
+      // キューファミリーからいくつのキューを作成するか
       queueInfo.queueCount = 1;
+      // キューの優先度を指定する
+      // 優先度は0から1であり、1の時に最高
+      // 優先度が高いキューの命令が優先されて処理される場合がある
       queueInfo.pQueuePriorities = &queuePriority;
       queueCreateInfos.push_back(queueInfo);
     }
@@ -194,17 +205,22 @@ class Application {
     deviceInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     deviceInfo.pNext = nullptr;
     deviceInfo.flags = 0;
+    // デバイスと同時に作成するキューの情報を登録する
     deviceInfo.queueCreateInfoCount =
         static_cast<uint32_t>(queueCreateInfos.size());
     deviceInfo.pQueueCreateInfos = queueCreateInfos.data();
+    // enabledLayerCount, ppEnabledLayerNamesは非推奨であり無視される
     deviceInfo.enabledLayerCount = 0;
     deviceInfo.ppEnabledLayerNames = nullptr;
+    // 有効化するデバイスエクステンションを登録する
     deviceInfo.enabledExtensionCount =
         static_cast<uint32_t>(deviceExtensionNames.size());
     deviceInfo.ppEnabledExtensionNames = deviceExtensionNames.data();
+    // 有効化するデバイスフィーチャー
     deviceInfo.pEnabledFeatures = &enabledFeatures;
 
     // vkCreateDevice(physicalDevice, pCreateInfo, pAllocator, pDevice)
+    // 論理デバイスを作成する
     result = vkCreateDevice(physicalDevice, &deviceInfo, nullptr, &device);
 
     if (result != VK_SUCCESS) {
@@ -451,6 +467,7 @@ class Application {
     return queueFamilyProperties;
   }
 
+  // 条件を満たす一番最初のデバイスを返す
   VkPhysicalDevice selectPhysicalDevice() {
     std::vector<VkPhysicalDevice> devices = getPhysicalDevices();
 
@@ -464,14 +481,14 @@ class Application {
   }
 
   bool isSuitablePhysicalDevice(VkPhysicalDevice device) {
-    std::vector<uint32_t> graphicsQueueFamilies =
-        findQueueFamilyIndices(device, VK_QUEUE_GRAPHICS_BIT);
-    return graphicsQueueFamilies.size() > 0;
+    std::optional<uint32_t> graphicsQueueFamily =
+        findQueueFamilyIndex(device, VK_QUEUE_GRAPHICS_BIT);
+    return graphicsQueueFamily.has_value();
   }
 
-  std::vector<uint32_t> findQueueFamilyIndices(VkPhysicalDevice device,
+  // フラグの条件を満たす一番最初のキューファミリーのインデックスを返す
+  std::optional<uint32_t> findQueueFamilyIndex(VkPhysicalDevice device,
                                                VkQueueFlags flags) {
-    std::vector<uint32_t> indices;
     std::vector<VkQueueFamilyProperties> families =
         getPhysicalDeviceQueueFamilyProperties(device);
 
@@ -479,11 +496,11 @@ class Application {
       auto&& family = families[i];
 
       if ((family.queueFlags & flags) != 0) {
-        indices.push_back(i);
+        return static_cast<uint32_t>(i);
       }
     }
 
-    return indices;
+    return std::nullopt;
   }
 
   std::vector<VkExtensionProperties> getDeviceExtensionProperties(
