@@ -37,3 +37,11 @@ CC0 1.0
 - [KhronosGroup/Vulkan-Hpp](https://github.com/KhronosGroup/Vulkan-Hpp)
   - KhronosによるVulkanのC++バインディング
 - [Vulkan Memory Allocator](https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator)
+
+### SDL
+
+- [SDL](https://www.libsdl.org/)
+- [libsdl-org/SDL](https://github.com/libsdl-org/SDL)
+- [SDL2 Wiki](https://wiki.libsdl.org/SDL2/FrontPage)
+- [SDL2 Wiki: Vulkan Support](https://wiki.libsdl.org/SDL2/CategoryVulkan)
+- [SDL 2.0 日本語リファレンスマニュアル](https://sdl2referencejp.osdn.jp/)
