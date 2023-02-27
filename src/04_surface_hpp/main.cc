@@ -37,7 +37,7 @@ class SDLApplication {
 
 class Application : public SDLApplication {
  public:
-  static constexpr char NAME[] = "04_surface";
+  static constexpr char NAME[] = "04_surface_hpp";
   static constexpr uint32_t WIDTH = 960;
   static constexpr uint32_t HEIGHT = 570;
 
