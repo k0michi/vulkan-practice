@@ -141,13 +141,13 @@ class Application : public SDLApplication {
 #endif
 
     // エクステンションとレイヤーを登録するだけでは、インスタンス生成/削除時のバリデーションが行われない
-    // インスタンス生成/削除時のバリデーションを有効にするには、vk::InstanceCreateInfoのpNextにvk::DebugUtilsMessengerCreateInfoEXTへのポインターを与える
+    // インスタンス生成/削除時のバリデーションを有効にするには、vk::InstanceCreateInfoのpNextにvk::DebugUtilsMessengerCreateInfoEXTへのポインターを与える必要がある
+    // Vulkan-Hppでは、vk::StructureChainによってpNextを設定する
     vk::StructureChain<vk::InstanceCreateInfo,
                        vk::DebugUtilsMessengerCreateInfoEXT>
         instanceChain{instanceInfo, messengerInfo};
 
-    // vkCreateInstance(pCreateInfo, pAllocator, pInstance)
-    // 今回はアロケータを使用しない (nullptr)
+    // vkCreateInstance(pCreateInfo, pAllocator, pInstance)に相当
     instance = std::make_shared<vk::raii::Instance>(
         context, instanceChain.get<vk::InstanceCreateInfo>());
 
@@ -157,10 +157,8 @@ class Application : public SDLApplication {
 
 #if ENABLE_VALIDATION
     // vkCreateDebugUtilsMessengerEXT(instance, pCreateInfo, pAllocator,
-    // pMessenger)
-    // vk::DebugUtilsMessengerを作る
-    // この関数は自動的にロードされないので、アプリケーション側でロードしなければならない
-    // (vulkan_ext.cc参照)
+    // pMessenger)に相当
+    // vk::DebugUtilsMessengerを作成する
     debugMessenger = std::make_shared<vk::raii::DebugUtilsMessengerEXT>(
         *instance, messengerInfo);
 #endif
@@ -168,6 +166,7 @@ class Application : public SDLApplication {
 
   void initializeSurface() {
     VkSurfaceKHR cSurface;
+    // ウィンドウの描画サーフェイスを作成する
     SDL_bool sResult =
         SDL_Vulkan_CreateSurface(window.get(), **instance, &cSurface);
     surface = std::make_shared<vk::raii::SurfaceKHR>(*instance, cSurface);
@@ -188,7 +187,7 @@ class Application : public SDLApplication {
 
     // 使用する物理デバイスを選択する
     physicalDevice = std::make_shared<vk::raii::PhysicalDevice>(
-        std::move(selectPhysicalDevice(devices, *surface)));
+        selectPhysicalDevice(devices, *surface));
     showPhysicalDevice("Selected physical device", *physicalDevice);
     showExtensions("Available device extensions",
                    physicalDevice->enumerateDeviceExtensionProperties());
@@ -243,7 +242,7 @@ class Application : public SDLApplication {
         // 有効化するデバイスフィーチャー
         /* pEnabledFeatures = */ &enabledFeatures};
 
-    // vkCreateDevice(physicalDevice, pCreateInfo, pAllocator, pDevice)
+    // vkCreateDevice(physicalDevice, pCreateInfo, pAllocator, pDevice)に相当
     // 論理デバイスを作成する
     device = std::make_shared<vk::raii::Device>(*physicalDevice, deviceInfo);
 
@@ -251,7 +250,7 @@ class Application : public SDLApplication {
               << "vkCreateDevice() succeeded" << Console::fgDefault
               << std::endl;
 
-    // vkGetDeviceQueue(device, queueFamilyIndex, queueIndex, pQueue)
+    // vkGetDeviceQueue(device, queueFamilyIndex, queueIndex, pQueue)に相当
     // 作成したキューを取得する
     // queueIndexはキューファミリー内のキューのインデックス
     graphicsQueue =
