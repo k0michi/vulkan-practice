@@ -78,3 +78,15 @@ target_link_libraries(04_surface_hpp SDL2::SDL2-static)
 
 target_include_directories(04_surface_hpp PRIVATE ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(04_surface_hpp ${Vulkan_LIBRARIES} "-framework AppKit" "-framework QuartzCore")
+
+
+# 05_hpp
+add_executable(05_swapchain_hpp
+  src/05_swapchain_hpp/main.cc
+)
+
+target_include_directories(05_swapchain_hpp PRIVATE third_party/SDL/include)
+target_link_libraries(05_swapchain_hpp SDL2::SDL2-static)
+
+target_include_directories(05_swapchain_hpp PRIVATE ${Vulkan_INCLUDE_DIRS})
+target_link_libraries(05_swapchain_hpp ${Vulkan_LIBRARIES} "-framework AppKit" "-framework QuartzCore")
